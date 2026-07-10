@@ -58,7 +58,6 @@ public class User : BaseEntity
         LastName = lastName.Trim();
     }
 
-    // Sadece harf ve boşluklara izin veren doğrulama fonksiyonu
     private static bool ContainsInvalidCharacters(string input)
     {
         return input.Any(c => !char.IsLetter(c) && !char.IsWhiteSpace(c));
