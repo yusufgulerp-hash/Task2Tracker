@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using Task2Tracker.Domain.Entities;
+using Task2Tracker.Application.Features.Users.DTOs;
 
 namespace Task2Tracker.Application.Features.Users.Queries.GetAllUsers;
 
-public record GetAllUsersQuery : IRequest<IReadOnlyList<User>>;
+public record GetAllUsersQuery : IRequest<List<UserListItemDto>>;

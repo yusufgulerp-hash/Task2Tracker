@@ -2,23 +2,25 @@
 using Task2Tracker.Application.Features.Users.DTOs;
 using Task2Tracker.Application.Interfaces.Repositories;
 
-namespace Task2Tracker.Application.Features.Users.Queries.GetAllUsers;
+namespace Task2Tracker.Application.Features.Users.Queries.SearchUsers;
 
-public class GetAllUsersQueryHandler
-    : IRequestHandler<GetAllUsersQuery, List<UserListItemDto>>
+public class SearchUsersQueryHandler
+    : IRequestHandler<SearchUsersQuery, List<UserListItemDto>>
 {
     private readonly IUserRepository _userRepository;
 
-    public GetAllUsersQueryHandler(IUserRepository userRepository)
+    public SearchUsersQueryHandler(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
 
     public async Task<List<UserListItemDto>> Handle(
-        GetAllUsersQuery request,
+        SearchUsersQuery request,
         CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetAllAsync(cancellationToken);
+        var users = await _userRepository.SearchAsync(
+            request.Text,
+            cancellationToken);
 
         return users
             .Select(user => new UserListItemDto(

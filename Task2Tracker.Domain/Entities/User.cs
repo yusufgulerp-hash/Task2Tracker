@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using Task2Tracker.Domain.Common;
 
 namespace Task2Tracker.Domain.Entities;
 
 public class User : BaseEntity
 {
+    public const int MaxFirstNameLength = 100;
+    public const int MaxLastNameLength = 100;
+    public const int MaxEmailLength = 255;
     private readonly List<Project> _projects = new();
     private readonly List<TaskItem> _tasks = new();
 
@@ -22,27 +26,20 @@ public class User : BaseEntity
     public User(string firstName, string lastName, string email)
     {
         ValidateAndSetName(firstName, lastName);
+        ValidateAndSetEmail(email);
 
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("E-posta adresi boş bırakılamaz.", nameof(email));
-
-        Id = Guid.NewGuid(); // BaseEntity'den gelen ID
-        Email = email;
-        CreatedAt = DateTime.UtcNow; // BaseEntity'den gelen oluşturulma tarihi
+        Id = Guid.NewGuid();
+        CreatedAt = DateTime.UtcNow;
     }
 
     public void UpdateDetails(string firstName, string lastName, string email)
     {
         ValidateAndSetName(firstName, lastName);
+        ValidateAndSetEmail(email);
 
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Güncellenen e-posta adresi boş olamaz.", nameof(email));
-
-        Email = email;
-        UpdatedAt = DateTime.UtcNow; // BaseEntity'den gelen güncellenme tarihi
+        UpdatedAt = DateTime.UtcNow;
     }
 
-    // 🌟 Domain Invariant: Sayı ve özel karakter kısıtlamasını merkezi olarak yöneten metot
     private void ValidateAndSetName(string firstName, string lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
@@ -53,9 +50,38 @@ public class User : BaseEntity
 
         if (ContainsInvalidCharacters(firstName) || ContainsInvalidCharacters(lastName))
             throw new ArgumentException("İsim veya soyisim alanı sayı veya özel karakter içeremez.");
+        if (firstName.Length > MaxFirstNameLength)
+            throw new ArgumentException(
+                $"İsim en fazla {MaxFirstNameLength} karakter olabilir.",
+                nameof(firstName));
 
+        if (lastName.Length > MaxLastNameLength)
+            throw new ArgumentException(
+                $"Soyisim en fazla {MaxLastNameLength} karakter olabilir.",
+                nameof(lastName));
         FirstName = firstName.Trim();
         LastName = lastName.Trim();
+    }
+
+
+    private void ValidateAndSetEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("E-posta adresi boş bırakılamaz.", nameof(email));
+        if (email.Length > MaxEmailLength)
+            throw new ArgumentException(
+                $"E-posta en fazla {MaxEmailLength} karakter olabilir.",
+                nameof(email));
+        try
+        {
+            _ = new MailAddress(email.Trim());
+        }
+        catch
+        {
+            throw new ArgumentException("Geçerli bir e-posta adresi giriniz.", nameof(email));
+        }
+
+        Email = email.Trim();
     }
 
     private static bool ContainsInvalidCharacters(string input)
