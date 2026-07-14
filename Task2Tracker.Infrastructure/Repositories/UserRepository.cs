@@ -56,6 +56,10 @@ public class UserRepository : IUserRepository
     {
         _context.Users.Add(user);
     }
+    public void Delete(User user)
+    {
+        _context.Users.Remove(user);
+    }
 
     public async Task<bool> ExistsByEmailAsync(
      string email,

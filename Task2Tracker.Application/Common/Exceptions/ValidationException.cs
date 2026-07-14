@@ -2,8 +2,12 @@
 
 public sealed class ValidationException : AppException
 {
-    public ValidationException(string message)
-        : base(message)
+    public IReadOnlyDictionary<string, string[]> Errors { get; }
+
+    public ValidationException(
+        IReadOnlyDictionary<string, string[]> errors)
+        : base("One or more validation failures occurred.")
     {
+        Errors = errors;
     }
 }

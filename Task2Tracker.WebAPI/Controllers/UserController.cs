@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Task2Tracker.Application.Features.Users.Commands.CreateUser;
+using Task2Tracker.Application.Features.Users.Commands.DeleteUser;
 using Task2Tracker.Application.Features.Users.Commands.UpdateUser;
 using Task2Tracker.Application.Features.Users.DTOs;
 using Task2Tracker.Application.Features.Users.Queries.GetAllUsers;
@@ -64,6 +65,13 @@ public class UsersController : ControllerBase
             request.Email);
 
         await _mediator.Send(command);
+
+        return NoContent();
+    }
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteUserCommand(id));
 
         return NoContent();
     }

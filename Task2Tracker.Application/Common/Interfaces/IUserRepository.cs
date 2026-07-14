@@ -21,7 +21,8 @@ public interface IUserRepository
 
     void Add(User user);
 
-  
+    void Delete(User user);
+
     Task<bool> ExistsByEmailAsync(
         string email,
         CancellationToken cancellationToken = default);

@@ -23,7 +23,7 @@ public static class DependencyInjection
             provider.GetRequiredService<ApplicationDbContext>());
 
         services.AddScoped<IUserRepository, UserRepository>();
-
+        services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddHybridCache();
 
         return services;
