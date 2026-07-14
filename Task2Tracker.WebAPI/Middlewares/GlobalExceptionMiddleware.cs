@@ -35,7 +35,6 @@ public sealed class GlobalExceptionMiddleware
         HttpContext context,
         Exception exception)
     {
-        Console.WriteLine("GLOBAL MIDDLEWARE ÇALIŞTI");
         context.Response.ContentType = "application/json";
 
         var statusCode = exception switch

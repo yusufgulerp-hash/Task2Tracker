@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Project Path="Task2Tracker.Application/Task2Tracker.Application.csproj" Id="30d6124d-8a37-4296-bf75-ef3aa3575c79" />
   <Project Path="Task2Tracker.Domain/Task2Tracker.Domain.csproj" />
   <Project Path="Task2Tracker.Infrastructure/Task2Tracker.Infrastructure.csproj" Id="91700da5-06fe-42df-aa88-716ebd463ad8" />

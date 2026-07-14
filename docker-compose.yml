@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: task2tracker-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: Task2TrackerDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  api:
+    build:
+      context: .
+      dockerfile: Task2Tracker.WebAPI/Dockerfile
+
+    container_name: task2tracker-api
+
+    restart: unless-stopped
+
+    depends_on:
+      - postgres
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=Task2TrackerDb;Username=postgres;Password=123
+
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
