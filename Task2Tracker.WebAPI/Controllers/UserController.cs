@@ -6,6 +6,7 @@ using Task2Tracker.Application.Features.Users.Commands.UpdateUser;
 using Task2Tracker.Application.Features.Users.DTOs;
 using Task2Tracker.Application.Features.Users.Queries.GetAllUsers;
 using Task2Tracker.Application.Features.Users.Queries.SearchUsers;
+using Task2Tracker.Application.Features.Users.Queries.GetUserById;
 using Task2Tracker.WebAPI.Contracts.Users;
 
 namespace Task2Tracker.WebAPI.Controllers;
@@ -68,6 +69,7 @@ public class UsersController : ControllerBase
 
         return NoContent();
     }
+    // DELETE: api/users/{id}
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -75,12 +77,13 @@ public class UsersController : ControllerBase
 
         return NoContent();
     }
-
-    // Geçici placeholder.
-    [ApiExplorerSettings(IgnoreApi = true)]
-    [NonAction]
-    public IActionResult GetById(Guid id)
+    // GET: api/users/{id}
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<UserDetailDto>> GetById(Guid id)
     {
-        throw new NotImplementedException();
+        var user = await _mediator.Send(new GetUserByIdQuery(id));
+
+        return Ok(user);
     }
+
 }

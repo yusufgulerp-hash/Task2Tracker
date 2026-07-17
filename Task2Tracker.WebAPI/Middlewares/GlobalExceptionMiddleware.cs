@@ -41,17 +41,30 @@ public sealed class GlobalExceptionMiddleware
         {
             ValidationException => StatusCodes.Status400BadRequest,
             BusinessRuleException => StatusCodes.Status400BadRequest,
-            ConflictException => StatusCodes.Status409Conflict,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
+            ForbiddenException => StatusCodes.Status403Forbidden,
             NotFoundException => StatusCodes.Status404NotFound,
+            ConflictException => StatusCodes.Status409Conflict,
+            AppException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
 
         context.Response.StatusCode = statusCode;
 
-        var response = new
+        object response = exception switch
         {
-            StatusCode = statusCode,
-            Message = exception.Message
+            ValidationException validationException => new
+            {
+                StatusCode = statusCode,
+                Message = validationException.Message,
+                Errors = validationException.Errors
+            },
+
+            _ => new
+            {
+                StatusCode = statusCode,
+                Message = exception.Message
+            }
         };
 
         await context.Response.WriteAsync(

@@ -22,6 +22,9 @@ RUN dotnet publish Task2Tracker.WebAPI/Task2Tracker.WebAPI.csproj \
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 EXPOSE 8080

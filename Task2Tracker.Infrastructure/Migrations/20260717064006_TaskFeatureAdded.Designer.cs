@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Task2Tracker.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Task2Tracker.Infrastructure.Persistence;
 namespace Task2Tracker.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260717064006_TaskFeatureAdded")]
+    partial class TaskFeatureAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,21 @@ namespace Task2Tracker.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ProjectUser", b =>
+                {
+                    b.Property<Guid>("MembersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProjectsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("MembersId", "ProjectsId");
+
+                    b.HasIndex("ProjectsId");
+
+                    b.ToTable("ProjectUser", (string)null);
+                });
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.Project", b =>
                 {
@@ -39,15 +57,10 @@ namespace Task2Tracker.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Projects", (string)null);
                 });
@@ -138,11 +151,19 @@ namespace Task2Tracker.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Task2Tracker.Domain.Entities.Project", b =>
+            modelBuilder.Entity("ProjectUser", b =>
                 {
                     b.HasOne("Task2Tracker.Domain.Entities.User", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("UserId");
+                        .WithMany()
+                        .HasForeignKey("MembersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Task2Tracker.Domain.Entities.Project", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.TaskItem", b =>
@@ -150,7 +171,7 @@ namespace Task2Tracker.Infrastructure.Migrations
                     b.HasOne("Task2Tracker.Domain.Entities.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Task2Tracker.Domain.Entities.User", "User")
@@ -170,8 +191,6 @@ namespace Task2Tracker.Infrastructure.Migrations
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Projects");
-
                     b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Task2Tracker.Application.Features.Projects.Commands.CreateProject;
 using Task2Tracker.Application.Features.Projects.Commands.UpdateProject;
+using Task2Tracker.Application.Features.Projects.Commands.DeleteProject;
 using Task2Tracker.Application.Features.Projects.DTOs;
 using Task2Tracker.Application.Features.Projects.Queries.GetAllProjects;
 using Task2Tracker.Application.Features.Projects.Queries.SearchProjects;
@@ -63,6 +64,15 @@ public sealed class ProjectsController : ControllerBase
             request.Name);
 
         await _mediator.Send(command);
+
+        return NoContent();
+    }
+
+    // DELETE: api/projects/{id}
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteProjectCommand(id));
 
         return NoContent();
     }

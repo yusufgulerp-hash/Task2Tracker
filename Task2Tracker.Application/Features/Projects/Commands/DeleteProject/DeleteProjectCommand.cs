@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
+using Task2Tracker.Application.Common.Interfaces;
 
-namespace Task2Tracker.Application.Features.Projects.Commands.DeleteProject
+namespace Task2Tracker.Application.Features.Projects.Commands.DeleteProject;
+
+public sealed record DeleteProjectCommand(Guid Id)
+    : IRequest, ICacheInvalidatingCommand
 {
-    internal class DeleteProjectCommand
-    {
-    }
+    public string[] CacheTagsToInvalidate => new[] { "projects" };
 }
