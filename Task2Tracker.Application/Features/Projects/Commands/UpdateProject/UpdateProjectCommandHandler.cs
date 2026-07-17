@@ -6,7 +6,7 @@ using Task2Tracker.Application.Interfaces.Repositories;
 namespace Task2Tracker.Application.Features.Projects.Commands.UpdateProject;
 
 public sealed class UpdateProjectCommandHandler
-    : IRequestHandler<UpdateProjectCommand>
+    : IRequestHandler<UpdateProjectCommand, Unit>
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IApplicationDbContext _context;
@@ -19,7 +19,7 @@ public sealed class UpdateProjectCommandHandler
         _context = context;
     }
 
-    public async Task Handle(
+    public async Task<Unit> Handle(
         UpdateProjectCommand request,
         CancellationToken cancellationToken)
     {
@@ -35,5 +35,7 @@ public sealed class UpdateProjectCommandHandler
         project.UpdateDetails(request.Name);
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
     }
 }

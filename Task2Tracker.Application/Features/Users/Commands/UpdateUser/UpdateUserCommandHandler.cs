@@ -6,7 +6,7 @@ using Task2Tracker.Application.Interfaces.Repositories;
 namespace Task2Tracker.Application.Features.Users.Commands.UpdateUser;
 
 public class UpdateUserCommandHandler
-    : IRequestHandler<UpdateUserCommand>
+    : IRequestHandler<UpdateUserCommand, Unit>
 {
     private readonly IUserRepository _userRepository;
     private readonly IApplicationDbContext _context;
@@ -19,17 +19,18 @@ public class UpdateUserCommandHandler
         _context = context;
     }
 
-    public async Task Handle(
+    public async Task<Unit> Handle(
         UpdateUserCommand request,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine("UPDATE HANDLER");
         var user = await _userRepository.GetByIdAsync(
             request.Id,
             cancellationToken);
 
         if (user is null)
         {
-            throw new NotFoundException("Kullanıcı bulunamadı.");
+            throw new NotFoundException("User not found.");
         }
 
         if (!string.Equals(
@@ -45,7 +46,7 @@ public class UpdateUserCommandHandler
                 existingUser.Id != user.Id)
             {
                 throw new ConflictException(
-                    "Bu e-posta adresi başka bir kullanıcı tarafından kullanılmaktadır.");
+                    "This email in use.");
             }
         }
 
@@ -55,5 +56,6 @@ public class UpdateUserCommandHandler
             request.Email);
 
         await _context.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
     }
 }

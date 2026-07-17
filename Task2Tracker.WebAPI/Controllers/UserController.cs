@@ -59,6 +59,7 @@ public class UsersController : ControllerBase
         Guid id,
         [FromBody] UpdateUserRequest request)
     {
+        Console.WriteLine("USERS CONTROLLER UPDATE");
         var command = new UpdateUserCommand(
             id,
             request.FirstName,
@@ -66,7 +67,6 @@ public class UsersController : ControllerBase
             request.Email);
 
         await _mediator.Send(command);
-
         return NoContent();
     }
     // DELETE: api/users/{id}

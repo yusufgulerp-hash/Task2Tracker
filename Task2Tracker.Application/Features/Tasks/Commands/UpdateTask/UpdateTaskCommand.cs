@@ -10,7 +10,8 @@ public sealed record UpdateTaskCommand(
     string? Description,
     TaskPriority Priority,
     TaskProgressStatus Status,
-    Guid? UserId) : IRequest, ICacheInvalidatingCommand
+    Guid? UserId)
+    : IRequest<Unit>, ICacheInvalidatingCommand
 {
     public string[] CacheTagsToInvalidate => new[] { "tasks" };
 }

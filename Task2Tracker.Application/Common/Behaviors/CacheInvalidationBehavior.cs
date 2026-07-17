@@ -15,20 +15,25 @@ public class CacheInvalidationBehavior<TRequest, TResponse> : IPipelineBehavior<
     }
 
     public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+     TRequest request,
+     RequestHandlerDelegate<TResponse> next,
+     CancellationToken cancellationToken)
     {
         var response = await next();
 
         if (request is ICacheInvalidatingCommand invalidatingCommand)
         {
+
             foreach (var tag in invalidatingCommand.CacheTagsToInvalidate)
             {
+
                 await _hybridCache.RemoveByTagAsync(tag, cancellationToken);
+
             }
         }
 
         return response;
     }
 }
+
+    

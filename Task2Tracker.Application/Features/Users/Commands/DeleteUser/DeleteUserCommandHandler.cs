@@ -6,7 +6,7 @@ using Task2Tracker.Application.Interfaces.Repositories;
 namespace Task2Tracker.Application.Features.Users.Commands.DeleteUser;
 
 public sealed class DeleteUserCommandHandler
-    : IRequestHandler<DeleteUserCommand>
+    : IRequestHandler<DeleteUserCommand, Unit>
 {
     private readonly IUserRepository _userRepository;
     private readonly IApplicationDbContext _context;
@@ -19,7 +19,7 @@ public sealed class DeleteUserCommandHandler
         _context = context;
     }
 
-    public async Task Handle(
+    public async Task<Unit> Handle(
         DeleteUserCommand request,
         CancellationToken cancellationToken)
     {
@@ -35,5 +35,7 @@ public sealed class DeleteUserCommandHandler
         _userRepository.Delete(user);
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
     }
 }

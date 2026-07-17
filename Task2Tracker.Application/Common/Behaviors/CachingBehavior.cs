@@ -24,7 +24,6 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         {
             return await next();
         }
-
         // HybridCache Ayarlarını yapılandırıyoruz
         var cacheOptions = new HybridCacheEntryOptions
         {
@@ -32,6 +31,7 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
             Expiration = cachableQuery.Expiration ?? TimeSpan.FromMinutes(5),
             LocalCacheExpiration = cachableQuery.Expiration ?? TimeSpan.FromMinutes(5)
         };
+
 
         // GetOrCreateAsync: CacheKey'e bakar. RAM'de varsa döndürür, yoksa "underlying factory" (yani next()) metodunu tetikleyip veri tabanından çeker ve cache'ler.
         TResponse response = await _hybridCache.GetOrCreateAsync(

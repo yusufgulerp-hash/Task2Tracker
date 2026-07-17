@@ -5,7 +5,7 @@ using Task2Tracker.Application.Common.Interfaces;
 namespace Task2Tracker.Application.Features.Tasks.Commands.DeleteTask;
 
 public sealed class DeleteTaskCommandHandler
-    : IRequestHandler<DeleteTaskCommand>
+    : IRequestHandler<DeleteTaskCommand, Unit>
 {
     private readonly ITaskRepository _taskRepository;
     private readonly IApplicationDbContext _context;
@@ -18,11 +18,13 @@ public sealed class DeleteTaskCommandHandler
         _context = context;
     }
 
-    public async Task Handle(
+    public async Task<Unit> Handle(
         DeleteTaskCommand request,
         CancellationToken cancellationToken)
     {
-        var task = await _taskRepository.GetByIdAsync(request.Id, cancellationToken);
+        var task = await _taskRepository.GetByIdAsync(
+            request.Id,
+            cancellationToken);
 
         if (task is null)
         {
@@ -32,5 +34,7 @@ public sealed class DeleteTaskCommandHandler
         _taskRepository.Delete(task);
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        return Unit.Value;
     }
 }
