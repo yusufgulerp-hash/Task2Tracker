@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Task2Tracker.Domain\Task2Tracker.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Tasks\Queries\SearchTasks\" />
-  </ItemGroup>
-
 </Project>

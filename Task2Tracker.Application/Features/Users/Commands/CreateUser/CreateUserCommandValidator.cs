@@ -7,7 +7,7 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     public CreateUserCommandValidator()
     {
         RuleFor(v => v.FirstName)
-            .NotEmpty().WithMessage("İsim alanı boş geçilemez.")
+            .NotEmpty().WithMessage("İsim alanı boş bırakılamaz.")
             .MaximumLength(User.MaxFirstNameLength).WithMessage("İsim en fazla 20 karakter olabilir.");
 
         RuleFor(v => v.LastName)

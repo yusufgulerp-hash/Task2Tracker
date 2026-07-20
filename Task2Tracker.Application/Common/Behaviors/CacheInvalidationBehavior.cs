@@ -5,7 +5,7 @@ using Task2Tracker.Application.Common.Interfaces;
 namespace Task2Tracker.Application.Common.Behaviors;
 
 public class CacheInvalidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : notnull
 {
     private readonly HybridCache _hybridCache;
 
@@ -15,25 +15,24 @@ public class CacheInvalidationBehavior<TRequest, TResponse> : IPipelineBehavior<
     }
 
     public async Task<TResponse> Handle(
-     TRequest request,
-     RequestHandlerDelegate<TResponse> next,
-     CancellationToken cancellationToken)
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[CacheInvalidationBehavior] ENTERED for {typeof(TRequest).Name}, is ICacheInvalidatingCommand: {request is ICacheInvalidatingCommand}");
+
         var response = await next();
 
         if (request is ICacheInvalidatingCommand invalidatingCommand)
         {
-
             foreach (var tag in invalidatingCommand.CacheTagsToInvalidate)
             {
-
+                Console.WriteLine($"Removing tag -> {tag}");
                 await _hybridCache.RemoveByTagAsync(tag, cancellationToken);
-
+                Console.WriteLine($"Removed tag -> {tag}");
             }
         }
 
         return response;
     }
 }
-
-    

@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Task2Tracker.Application.Features.Users.Commands.CreateUser;
 using Task2Tracker.Application.Features.Users.Commands.DeleteUser;
 using Task2Tracker.Application.Features.Users.Commands.UpdateUser;
 using Task2Tracker.Application.Features.Users.DTOs;
@@ -22,21 +21,6 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
 
-    // POST: api/users
-    [HttpPost]
-    public async Task<ActionResult<Guid>> Create(
-        [FromBody] CreateUserRequest request)
-    {
-        var command = new CreateUserCommand(
-            request.FirstName,
-            request.LastName,
-            request.Email);
-
-        var userId = await _mediator.Send(command);
-
-        return Ok(userId);
-    }
-
     // GET: api/users
     [HttpGet]
     public async Task<ActionResult<List<UserListItemDto>>> GetAll()
@@ -45,7 +29,8 @@ public class UsersController : ControllerBase
 
         return Ok(users);
     }
-    [HttpGet("search")]
+    // GET: api/users/search?text=...
+    [HttpGet]
     public async Task<ActionResult<List<UserListItemDto>>> Search(
     [FromQuery] string text)
     {
@@ -53,13 +38,21 @@ public class UsersController : ControllerBase
 
         return Ok(users);
     }
+    // GET: api/users/{id}
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<UserDetailDto>> GetById(Guid id)
+    {
+        var user = await _mediator.Send(new GetUserByIdQuery(id));
+
+        return Ok(user);
+    }
+
     // PUT: api/users/{id}
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
         Guid id,
         [FromBody] UpdateUserRequest request)
     {
-        Console.WriteLine("USERS CONTROLLER UPDATE");
         var command = new UpdateUserCommand(
             id,
             request.FirstName,
@@ -76,14 +69,6 @@ public class UsersController : ControllerBase
         await _mediator.Send(new DeleteUserCommand(id));
 
         return NoContent();
-    }
-    // GET: api/users/{id}
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserDetailDto>> GetById(Guid id)
-    {
-        var user = await _mediator.Send(new GetUserByIdQuery(id));
-
-        return Ok(user);
     }
 
 }

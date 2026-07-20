@@ -6,20 +6,23 @@ using Task2Tracker.Application.Interfaces.Repositories;
 namespace Task2Tracker.Application.Features.Projects.Commands.DeleteProject;
 
 public sealed class DeleteProjectCommandHandler
-    : IRequestHandler<DeleteProjectCommand, Unit>
+    : IRequestHandler<DeleteProjectCommand>
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly ITaskRepository _taskRepository;
     private readonly IApplicationDbContext _context;
 
     public DeleteProjectCommandHandler(
         IProjectRepository projectRepository,
+        ITaskRepository taskRepository,
         IApplicationDbContext context)
     {
         _projectRepository = projectRepository;
+        _taskRepository = taskRepository;
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task Handle(
         DeleteProjectCommand request,
         CancellationToken cancellationToken)
     {
@@ -28,14 +31,18 @@ public sealed class DeleteProjectCommandHandler
             cancellationToken);
 
         if (project is null)
-        {
             throw new NotFoundException("Project not found.");
-        }
+
+        var hasOpenTasks = await _taskRepository.HasOpenTasksByProjectIdAsync(
+            request.Id,
+            cancellationToken);
+
+        if (hasOpenTasks)
+            throw new BusinessRuleException(
+                "Açık (tamamlanmamış) görevleri olan bir proje silinemez.");
 
         _projectRepository.Delete(project);
 
         await _context.SaveChangesAsync(cancellationToken);
-
-        return Unit.Value;
     }
 }

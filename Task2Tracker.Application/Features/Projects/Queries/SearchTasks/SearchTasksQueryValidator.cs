@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 
-namespace Task2Tracker.Application.Features.Projects.Queries.SearchProjects;
+namespace Task2Tracker.Application.Features.Tasks.Queries.SearchTasks;
 
-public sealed class SearchProjectsQueryValidator
-    : AbstractValidator<SearchProjectsQuery>
+public sealed class SearchTasksQueryValidator
+    : AbstractValidator<SearchTasksQuery>
 {
-    public SearchProjectsQueryValidator()
+    public SearchTasksQueryValidator()
     {
         RuleFor(x => x.Text)
             .NotEmpty()

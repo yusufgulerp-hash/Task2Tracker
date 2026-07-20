@@ -89,6 +89,12 @@ public class TaskItem : BaseEntity
 
         Title = title;
         Description = description;
+
+        if (Status == TaskProgressStatus.Done)
+        {
+            Status = TaskProgressStatus.InProgress;
+        }
+
         UpdatedAt = DateTime.UtcNow;
     }
 

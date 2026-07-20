@@ -10,7 +10,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.ToTable("Users");
 
-        // BaseEntity'den gelen birincil anahtar
         builder.HasKey(u => u.Id);
 
         builder.Property(u => u.FirstName)
@@ -23,12 +22,26 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Email)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(255);
+
+        builder.Property(u => u.PasswordHash)
+            .IsRequired()
+            .HasMaxLength(500);
+
+        builder.Property(u => u.Role)
+            .IsRequired()
+            .HasConversion<int>();
 
         builder.HasIndex(u => u.Email).IsUnique();
 
-        // 🌟 PostgreSQL seviyesinde sayıları engelleyen Check Constraint koruması
-        builder.ToTable(t => t.HasCheckConstraint("CK_User_FirstName_NoNumbers", "\"FirstName\" !~ '[0-9]'"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_User_LastName_NoNumbers", "\"LastName\" !~ '[0-9]'"));
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_User_FirstName_NoNumbers", "\"FirstName\" !~ '[0-9]'");
+            t.HasCheckConstraint("CK_User_LastName_NoNumbers", "\"LastName\" !~ '[0-9]'");
+        });
+
+        builder.Metadata
+            .FindNavigation(nameof(User.RefreshTokens))?
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

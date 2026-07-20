@@ -1,11 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Task2Tracker.Application.Features.Tasks.Commands.AssignTask;
 using Task2Tracker.Application.Features.Tasks.Commands.CreateTask;
 using Task2Tracker.Application.Features.Tasks.Commands.DeleteTask;
+using Task2Tracker.Application.Features.Tasks.Commands.UnassignTask;
 using Task2Tracker.Application.Features.Tasks.Commands.UpdateTask;
 using Task2Tracker.Application.Features.Tasks.DTOs;
 using Task2Tracker.Application.Features.Tasks.Queries.GetAllTasks;
 using Task2Tracker.Application.Features.Tasks.Queries.GetTaskById;
+using Task2Tracker.Application.Features.Tasks.Queries.SearchTasks;
+using Task2Tracker.Domain.Enums;
 using Task2Tracker.WebAPI.Contracts.Tasks;
 
 namespace Task2Tracker.WebAPI.Controllers;
@@ -37,11 +41,26 @@ public sealed class TasksController : ControllerBase
         return Ok(taskId);
     }
 
-    // GET: api/tasks
+    // GET: api/tasks?projectId=...&userId=...&status=...&priority=...
     [HttpGet]
-    public async Task<ActionResult<List<TaskListItemDto>>> GetAll()
+    public async Task<ActionResult<List<TaskListItemDto>>> GetAll(
+        [FromQuery] Guid? projectId = null,
+        [FromQuery] Guid? userId = null,
+        [FromQuery] TaskProgressStatus? status = null,
+        [FromQuery] TaskPriority? priority = null)
     {
-        var tasks = await _mediator.Send(new GetAllTasksQuery());
+        var tasks = await _mediator.Send(
+            new GetAllTasksQuery(projectId, userId, status, priority));
+
+        return Ok(tasks);
+    }
+
+    // GET: api/tasks/search?text=...
+    [HttpGet("search")]
+    public async Task<ActionResult<List<TaskListItemDto>>> Search(
+        [FromQuery] string text)
+    {
+        var tasks = await _mediator.Send(new SearchTasksQuery(text));
 
         return Ok(tasks);
     }
@@ -70,6 +89,26 @@ public sealed class TasksController : ControllerBase
             request.UserId);
 
         await _mediator.Send(command);
+
+        return NoContent();
+    }
+
+    // PUT: api/tasks/{id}/assign
+    [HttpPut("{id:guid}/assign")]
+    public async Task<IActionResult> Assign(
+        Guid id,
+        [FromQuery] Guid userId)
+    {
+        await _mediator.Send(new AssignTaskCommand(id, userId));
+
+        return NoContent();
+    }
+
+    // DELETE: api/tasks/{id}/assign
+    [HttpDelete("{id:guid}/assign")]
+    public async Task<IActionResult> Unassign(Guid id)
+    {
+        await _mediator.Send(new UnassignTaskCommand(id));
 
         return NoContent();
     }

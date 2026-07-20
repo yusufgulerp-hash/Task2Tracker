@@ -2,15 +2,14 @@
 using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Common.Interfaces;
 
-namespace Task2Tracker.Application.Features.Tasks.Commands.DeleteTask;
+namespace Task2Tracker.Application.Features.Tasks.Commands.UnassignTask;
 
-public sealed class DeleteTaskCommandHandler
-    : IRequestHandler<DeleteTaskCommand>
+public sealed class UnassignTaskCommandHandler : IRequestHandler<UnassignTaskCommand>
 {
     private readonly ITaskRepository _taskRepository;
     private readonly IApplicationDbContext _context;
 
-    public DeleteTaskCommandHandler(
+    public UnassignTaskCommandHandler(
         ITaskRepository taskRepository,
         IApplicationDbContext context)
     {
@@ -19,20 +18,19 @@ public sealed class DeleteTaskCommandHandler
     }
 
     public async Task Handle(
-        DeleteTaskCommand request,
+        UnassignTaskCommand request,
         CancellationToken cancellationToken)
     {
         var task = await _taskRepository.GetByIdAsync(
-            request.Id, cancellationToken);
+            request.TaskId, cancellationToken);
 
         if (task is null)
             throw new NotFoundException("Görev bulunamadı.");
 
-        if (task.Status != Domain.Enums.TaskProgressStatus.Done)
-            throw new BusinessRuleException(
-                "Yalnızca tamamlanmış (Done) görevler silinebilir.");
+        if (task.UserId is null)
+            throw new BusinessRuleException("Bu görev zaten hiçbir kullanıcıya atanmamış.");
 
-        _taskRepository.Delete(task);
+        task.UnassignUser();
 
         await _context.SaveChangesAsync(cancellationToken);
     }

@@ -1,4 +1,4 @@
-﻿using Task2Tracker.Application.Common.Exceptions;
+﻿namespace Task2Tracker.Application.Common.Exceptions;
 
 public sealed class NotFoundException : AppException
 {

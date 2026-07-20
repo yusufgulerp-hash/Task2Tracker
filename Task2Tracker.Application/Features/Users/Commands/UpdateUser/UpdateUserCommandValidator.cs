@@ -2,9 +2,9 @@
 using Task2Tracker.Domain.Entities;
 namespace Task2Tracker.Application.Features.Users.Commands.UpdateUser;
 
-public class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
+public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
-    public UpdateUserValidator()
+    public UpdateUserCommandValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty();

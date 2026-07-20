@@ -34,7 +34,8 @@ public class CreateUserCommandHandler
         var user = new Domain.Entities.User(
             request.FirstName,
             request.LastName,
-            request.Email);
+            request.Email,
+            request.PasswordHash);
 
         _userRepository.Add(user);
 

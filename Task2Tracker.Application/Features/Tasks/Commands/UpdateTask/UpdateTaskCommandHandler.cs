@@ -6,7 +6,7 @@ using Task2Tracker.Application.Interfaces.Repositories;
 namespace Task2Tracker.Application.Features.Tasks.Commands.UpdateTask;
 
 public sealed class UpdateTaskCommandHandler
-    : IRequestHandler<UpdateTaskCommand, Unit>
+    : IRequestHandler<UpdateTaskCommand>
 {
     private readonly ITaskRepository _taskRepository;
     private readonly IUserRepository _userRepository;
@@ -22,23 +22,18 @@ public sealed class UpdateTaskCommandHandler
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task Handle(
         UpdateTaskCommand request,
         CancellationToken cancellationToken)
     {
         var task = await _taskRepository.GetByIdAsync(
-            request.Id,
-            cancellationToken);
+            request.Id, cancellationToken);
 
         if (task is null)
-        {
-            throw new NotFoundException("Task not found.");
-        }
+            throw new NotFoundException("Görev bulunamadı.");
 
-        task.UpdateDetails(
-            request.Title,
-            request.Description);
-
+        // Done task'ı otomatik InProgress'e çeker, sonra status güncellemesi uygulanır
+        task.UpdateDetails(request.Title, request.Description);
         task.UpdatePriority(request.Priority);
 
         if (task.Status != request.Status)
@@ -56,13 +51,10 @@ public sealed class UpdateTaskCommandHandler
         if (request.UserId.HasValue)
         {
             var user = await _userRepository.GetByIdAsync(
-                request.UserId.Value,
-                cancellationToken);
+                request.UserId.Value, cancellationToken);
 
             if (user is null)
-            {
-                throw new NotFoundException("Assigned user not found.");
-            }
+                throw new NotFoundException("Atanacak kullanıcı bulunamadı.");
 
             task.AssignUser(request.UserId.Value);
         }
@@ -72,7 +64,5 @@ public sealed class UpdateTaskCommandHandler
         }
 
         await _context.SaveChangesAsync(cancellationToken);
-
-        return Unit.Value;
     }
 }
