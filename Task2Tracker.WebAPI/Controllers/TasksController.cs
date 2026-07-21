@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;   
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Task2Tracker.Application.Features.Tasks.Commands.AssignTask;
 using Task2Tracker.Application.Features.Tasks.Commands.CreateTask;
 using Task2Tracker.Application.Features.Tasks.Commands.DeleteTask;
@@ -14,6 +16,7 @@ using Task2Tracker.WebAPI.Contracts.Tasks;
 
 namespace Task2Tracker.WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public sealed class TasksController : ControllerBase
@@ -26,6 +29,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // POST: api/tasks
+
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
         [FromBody] CreateTaskRequest request)
@@ -43,6 +47,7 @@ public sealed class TasksController : ControllerBase
 
     // GET: api/tasks?projectId=...&userId=...&status=...&priority=...
     [HttpGet]
+  
     public async Task<ActionResult<List<TaskListItemDto>>> GetAll(
         [FromQuery] Guid? projectId = null,
         [FromQuery] Guid? userId = null,
@@ -56,6 +61,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // GET: api/tasks/search?text=...
+
     [HttpGet("search")]
     public async Task<ActionResult<List<TaskListItemDto>>> Search(
         [FromQuery] string text)
@@ -66,6 +72,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // GET: api/tasks/{id}
+
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TaskListItemDto>> GetById(Guid id)
     {
@@ -75,6 +82,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // PUT: api/tasks/{id}
+ 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
         Guid id,
@@ -94,6 +102,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // PUT: api/tasks/{id}/assign
+ 
     [HttpPut("{id:guid}/assign")]
     public async Task<IActionResult> Assign(
         Guid id,
@@ -105,6 +114,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // DELETE: api/tasks/{id}/assign
+ 
     [HttpDelete("{id:guid}/assign")]
     public async Task<IActionResult> Unassign(Guid id)
     {
@@ -114,6 +124,7 @@ public sealed class TasksController : ControllerBase
     }
 
     // DELETE: api/tasks/{id}
+   
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

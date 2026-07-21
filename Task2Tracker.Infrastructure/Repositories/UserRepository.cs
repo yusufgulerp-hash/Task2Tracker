@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Task2Tracker.Application.Interfaces.Repositories;
 using Task2Tracker.Domain.Entities;
+using Task2Tracker.Domain.Enums;
 using Task2Tracker.Infrastructure.Persistence;
 
 namespace Task2Tracker.Infrastructure.Repositories;
@@ -50,6 +51,14 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(
                 x => x.Email == email,
                 cancellationToken);
+    }
+    public async Task<IReadOnlyList<User>> GetByStatusAsync(
+    UserStatus status,
+    CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .Where(user => user.Status == status)
+            .ToListAsync(cancellationToken);
     }
 
     public void Add(User user)

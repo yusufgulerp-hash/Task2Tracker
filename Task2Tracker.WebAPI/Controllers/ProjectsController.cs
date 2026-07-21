@@ -1,8 +1,10 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Task2Tracker.Application.Features.Projects.Commands.CreateProject;
-using Task2Tracker.Application.Features.Projects.Commands.UpdateProject;
 using Task2Tracker.Application.Features.Projects.Commands.DeleteProject;
+using Task2Tracker.Application.Features.Projects.Commands.UpdateProject;
 using Task2Tracker.Application.Features.Projects.DTOs;
 using Task2Tracker.Application.Features.Projects.Queries.GetAllProjects;
 using Task2Tracker.Application.Features.Projects.Queries.SearchProjects;
@@ -10,6 +12,7 @@ using Task2Tracker.WebAPI.Contracts.Projects;
 
 namespace Task2Tracker.WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public sealed class ProjectsController : ControllerBase
@@ -22,6 +25,7 @@ public sealed class ProjectsController : ControllerBase
     }
 
     // POST: api/projects
+ 
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
         [FromBody] CreateProjectRequest request)
@@ -34,6 +38,7 @@ public sealed class ProjectsController : ControllerBase
     }
 
     // GET: api/projects
+ 
     [HttpGet]
     public async Task<ActionResult<List<ProjectListItemDto>>> GetAll()
     {
@@ -44,6 +49,7 @@ public sealed class ProjectsController : ControllerBase
 
     // GET: api/projects/search?text=test
     [HttpGet("search")]
+  
     public async Task<ActionResult<List<ProjectListItemDto>>> Search(
         [FromQuery] string text)
     {
@@ -54,6 +60,7 @@ public sealed class ProjectsController : ControllerBase
     }
 
     // PUT: api/projects/{id}
+  
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
         Guid id,
@@ -69,6 +76,7 @@ public sealed class ProjectsController : ControllerBase
     }
 
     // DELETE: api/projects/{id}
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

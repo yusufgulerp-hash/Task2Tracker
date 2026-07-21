@@ -1,4 +1,5 @@
 ﻿using Task2Tracker.Domain.Entities;
+using Task2Tracker.Domain.Enums;
 
 namespace Task2Tracker.Application.Interfaces.Repositories;
 
@@ -18,6 +19,9 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(
         string email,
         CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<User>> GetByStatusAsync(
+    UserStatus status,
+    CancellationToken cancellationToken = default);
 
     void Add(User user);
 
