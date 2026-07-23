@@ -2,7 +2,6 @@
 
 public sealed record AuthResponseDto(
     string AccessToken,
-    string RefreshToken,
     Guid UserId,
     string Email,
     string Role);

@@ -27,5 +27,9 @@ public sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Metadata
             .FindNavigation(nameof(Project.Tasks))?
             .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Metadata
+            .FindNavigation(nameof(Project.Members))?
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

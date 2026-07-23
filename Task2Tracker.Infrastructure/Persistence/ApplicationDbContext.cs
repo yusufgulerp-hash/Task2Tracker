@@ -16,7 +16,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
     public DbSet<User> Users => Set<User>();
-    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
 
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

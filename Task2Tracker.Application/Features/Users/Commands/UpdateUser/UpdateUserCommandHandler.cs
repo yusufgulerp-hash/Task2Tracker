@@ -10,20 +10,30 @@ public class UpdateUserCommandHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public UpdateUserCommandHandler(
         IUserRepository userRepository,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _userRepository = userRepository;
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<Unit> Handle(
         UpdateUserCommand request,
         CancellationToken cancellationToken)
     {
-        Console.WriteLine("UPDATE HANDLER");
+        // Bir kullanıcı yalnızca kendi profilini güncelleyebilir;
+        // Admin ise herkesi güncelleyebilir.
+        if (!_currentUser.IsAdmin && _currentUser.UserId != request.Id)
+        {
+            throw new ForbiddenException(
+                "Başka bir kullanıcının bilgilerini güncelleme yetkiniz yok.");
+        }
+
         var user = await _userRepository.GetByIdAsync(
             request.Id,
             cancellationToken);

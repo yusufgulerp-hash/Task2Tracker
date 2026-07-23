@@ -40,8 +40,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             t.HasCheckConstraint("CK_User_LastName_NoNumbers", "\"LastName\" !~ '[0-9]'");
         });
 
-        builder.Metadata
-            .FindNavigation(nameof(User.RefreshTokens))?
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

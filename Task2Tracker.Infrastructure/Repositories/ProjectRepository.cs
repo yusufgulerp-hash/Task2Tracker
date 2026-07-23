@@ -33,6 +33,17 @@ public sealed class ProjectRepository : IProjectRepository
                 cancellationToken);
     }
 
+    public async Task<Project?> GetByIdWithMembersAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Projects
+            .Include(x => x.Members)
+            .FirstOrDefaultAsync(
+                x => x.Id == id,
+                cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Project>> SearchAsync(
         string text,
         CancellationToken cancellationToken = default)

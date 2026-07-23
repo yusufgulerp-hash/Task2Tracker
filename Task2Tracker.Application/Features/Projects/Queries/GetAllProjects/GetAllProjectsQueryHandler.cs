@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Task2Tracker.Application.Common.Interfaces;
 using Task2Tracker.Application.Features.Projects.DTOs;
 using Task2Tracker.Application.Interfaces.Repositories;
 
@@ -8,11 +10,17 @@ public sealed class GetAllProjectsQueryHandler
     : IRequestHandler<GetAllProjectsQuery, List<ProjectListItemDto>>
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public GetAllProjectsQueryHandler(
-        IProjectRepository projectRepository)
+        IProjectRepository projectRepository,
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _projectRepository = projectRepository;
+        _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<List<ProjectListItemDto>> Handle(
@@ -20,6 +28,21 @@ public sealed class GetAllProjectsQueryHandler
         CancellationToken cancellationToken)
     {
         var projects = await _projectRepository.GetAllAsync(cancellationToken);
+
+        // Admin tüm projeleri görür; diğer kullanıcılar sadece üyesi
+        // olduğu projeleri görebilir ("kullanıcı sadece üyesi olduğu
+        // projeyi görebilmeli" kuralı).
+        if (!_currentUser.IsAdmin)
+        {
+            var memberProjectIds = await _context.ProjectMembers
+                .Where(m => m.UserId == _currentUser.UserId)
+                .Select(m => m.ProjectId)
+                .ToListAsync(cancellationToken);
+
+            projects = projects
+                .Where(p => memberProjectIds.Contains(p.Id))
+                .ToList();
+        }
 
         return projects
             .Select(project => new ProjectListItemDto(

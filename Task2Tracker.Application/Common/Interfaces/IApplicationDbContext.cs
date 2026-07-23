@@ -10,6 +10,7 @@ public interface IApplicationDbContext
     DbSet<Project> Projects { get; }
     DbSet<TaskItem> Tasks { get; }
     DbSet<User> Users { get; }
+    DbSet<ProjectMember> ProjectMembers { get; }
 
     // Yapılan değişiklikleri veri tabanına atomik olarak kaydeder
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

@@ -9,6 +9,7 @@ using Task2Tracker.Application.Features.Tasks.Commands.UnassignTask;
 using Task2Tracker.Application.Features.Tasks.Commands.UpdateTask;
 using Task2Tracker.Application.Features.Tasks.DTOs;
 using Task2Tracker.Application.Features.Tasks.Queries.GetAllTasks;
+using Task2Tracker.Application.Features.Tasks.Queries.GetMyTasks;
 using Task2Tracker.Application.Features.Tasks.Queries.GetTaskById;
 using Task2Tracker.Application.Features.Tasks.Queries.SearchTasks;
 using Task2Tracker.Domain.Enums;
@@ -67,6 +68,18 @@ public sealed class TasksController : ControllerBase
         [FromQuery] string text)
     {
         var tasks = await _mediator.Send(new SearchTasksQuery(text));
+
+        return Ok(tasks);
+    }
+
+    // GET: api/tasks/mine?status=...&priority=...
+    // "My Tasks" sekmesi — UserId her zaman token'dan gelir, query'den değil.
+    [HttpGet("mine")]
+    public async Task<ActionResult<List<TaskListItemDto>>> GetMine(
+        [FromQuery] TaskProgressStatus? status = null,
+        [FromQuery] TaskPriority? priority = null)
+    {
+        var tasks = await _mediator.Send(new GetMyTasksQuery(status, priority));
 
         return Ok(tasks);
     }

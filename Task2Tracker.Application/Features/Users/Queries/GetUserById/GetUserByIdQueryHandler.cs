@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Features.Users.DTOs;
 using Task2Tracker.Application.Interfaces.Repositories;
 
@@ -24,7 +25,10 @@ public class GetUserByIdQueryHandler
 
         if (user is null)
         {
-            throw new KeyNotFoundException(
+            // Daha önce burada KeyNotFoundException fırlatılıyordu — bu tip
+            // GlobalExceptionMiddleware'in bildiği bir tip olmadığı için 404
+            // yerine 500 dönüyordu. NotFoundException ile düzeltiyoruz.
+            throw new NotFoundException(
                 $"User with id '{request.Id}' is not found.");
         }
 

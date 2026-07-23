@@ -36,7 +36,6 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         // ==========================
         // Cache
@@ -46,13 +45,18 @@ public static class DependencyInjection
         services.AddSingleton<IIpBanService, MemoryIpBanService>();
 
         // ==========================
+        // Current User (HttpContext'ten kimlik bilgisi)
+        // ==========================
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        // ==========================
         // JWT Ayarları
         // ==========================
         // Options Pattern: appsettings'teki "JwtSettings" bloğunu JwtSettings sınıfına bağla
         services.Configure<JwtSettings>(
             configuration.GetSection("JwtSettings"));
 
-        // JwtService hem IJwtService hem IPasswordService implement ediyor
         // Scoped: her HTTP isteği için bir instance
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordService, JwtService>();
@@ -67,7 +71,6 @@ public static class DependencyInjection
         services
             .AddAuthentication(options =>
             {
-                // Varsayılan scheme JWT olsun
                 options.DefaultAuthenticateScheme =
                     JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme =
@@ -75,6 +78,11 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
+                // "sub" claim'i varsayılan olarak ClaimTypes.NameIdentifier'a
+                // map'lenebiliyor; bunu kapatıp token'daki claim adlarını
+                // olduğu gibi (sub, email, role) kullanıyoruz.
+                options.MapInboundClaims = false;
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,

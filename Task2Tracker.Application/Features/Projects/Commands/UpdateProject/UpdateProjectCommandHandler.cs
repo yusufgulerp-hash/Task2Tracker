@@ -10,26 +10,34 @@ public sealed class UpdateProjectCommandHandler
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public UpdateProjectCommandHandler(
         IProjectRepository projectRepository,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _projectRepository = projectRepository;
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<Unit> Handle(
         UpdateProjectCommand request,
         CancellationToken cancellationToken)
     {
-        var project = await _projectRepository.GetByIdAsync(
+        var project = await _projectRepository.GetByIdWithMembersAsync(
             request.Id,
             cancellationToken);
 
         if (project is null)
         {
             throw new NotFoundException("Project not found.");
+        }
+
+        if (!_currentUser.IsAdmin && !project.IsMember(_currentUser.UserId))
+        {
+            throw new ForbiddenException("Bu projeyi güncelleme yetkiniz yok.");
         }
 
         project.UpdateDetails(request.Name);

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Common.Interfaces;
 using Task2Tracker.Application.Interfaces.Repositories;
 using Task2Tracker.Domain.Entities;
@@ -10,13 +11,16 @@ public sealed class CreateProjectCommandHandler
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public CreateProjectCommandHandler(
         IProjectRepository projectRepository,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _projectRepository = projectRepository;
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<Guid> Handle(
@@ -29,10 +33,15 @@ public sealed class CreateProjectCommandHandler
 
         if (exists)
         {
-            throw new Exception("Project name already exists.");
+            throw new ConflictException("Bu isimde bir proje zaten mevcut.");
         }
 
         var project = new Project(request.Name);
+
+        // Projeyi oluşturan kişi otomatik olarak üye olur — aksi halde
+        // GetAllProjects'teki üyelik filtresi devreye girdiğinde kendi
+        // oluşturduğu projeyi bile göremezdi.
+        project.AddMember(_currentUser.UserId);
 
         _projectRepository.Add(project);
 

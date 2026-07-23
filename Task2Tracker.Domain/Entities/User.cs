@@ -11,7 +11,6 @@ public class User : BaseEntity
     public const int MaxEmailLength = 255;
 
     private readonly List<TaskItem> _tasks = new();
-    private readonly List<RefreshToken> _refreshTokens = new();
 
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
@@ -21,7 +20,6 @@ public class User : BaseEntity
     public UserStatus Status { get; private set; }
 
     public IReadOnlyCollection<TaskItem> Tasks => _tasks.AsReadOnly();
-    public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
 
     protected User() { }
 

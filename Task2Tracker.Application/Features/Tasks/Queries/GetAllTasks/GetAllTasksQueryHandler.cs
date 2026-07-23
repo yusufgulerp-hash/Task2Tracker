@@ -9,10 +9,14 @@ public sealed class GetAllTasksQueryHandler
     : IRequestHandler<GetAllTasksQuery, List<TaskListItemDto>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetAllTasksQueryHandler(IApplicationDbContext context)
+    public GetAllTasksQueryHandler(
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<List<TaskListItemDto>> Handle(
@@ -20,6 +24,15 @@ public sealed class GetAllTasksQueryHandler
         CancellationToken cancellationToken)
     {
         var query = _context.Tasks.AsNoTracking();
+
+        if (!_currentUser.IsAdmin)
+        {
+            var memberProjectIds = _context.ProjectMembers
+                .Where(m => m.UserId == _currentUser.UserId)
+                .Select(m => m.ProjectId);
+
+            query = query.Where(x => memberProjectIds.Contains(x.ProjectId));
+        }
 
         if (request.ProjectId.HasValue)
             query = query.Where(x => x.ProjectId == request.ProjectId.Value);

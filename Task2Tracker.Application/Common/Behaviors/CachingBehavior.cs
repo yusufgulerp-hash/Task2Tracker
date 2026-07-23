@@ -11,10 +11,12 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     where TRequest : IRequest<TResponse>
 {
     private readonly HybridCache _hybridCache;
+    private readonly ICurrentUserService _currentUser;
 
-    public CachingBehavior(HybridCache hybridCache)
+    public CachingBehavior(HybridCache hybridCache, ICurrentUserService currentUser)
     {
         _hybridCache = hybridCache;
+        _currentUser = currentUser;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -24,6 +26,20 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         {
             return await next();
         }
+
+        // ÖNEMLİ: Cache key'i her zaman isteği atan kullanıcıya göre scope'luyoruz.
+        // Aksi halde, sonucu kullanıcıya göre farklılaşan bir query (ör. üyelik
+        // filtresi uygulanan GetAllProjects) sabit bir key ile cache'lenirse,
+        // kullanıcı A'nın gördüğü sonuç kullanıcı B'ye servis edilebilir —
+        // bu bir cache-based veri sızıntısı olur. Bu yüzden "sonucu kullanıcıya
+        // göre değişmiyor" diye bilinen query'ler için bile bu scope'lama
+        // güvenli bir varsayılan: en kötü ihtimalle biraz daha düşük hit-rate.
+        var scope = _currentUser.IsAuthenticated
+            ? (_currentUser.IsAdmin ? "admin" : _currentUser.UserId.ToString())
+            : "anonymous";
+
+        var scopedCacheKey = $"{cachableQuery.CacheKey}:{scope}";
+
         // HybridCache Ayarlarını yapılandırıyoruz
         var cacheOptions = new HybridCacheEntryOptions
         {
@@ -35,7 +51,7 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
 
         // GetOrCreateAsync: CacheKey'e bakar. RAM'de varsa döndürür, yoksa "underlying factory" (yani next()) metodunu tetikleyip veri tabanından çeker ve cache'ler.
         TResponse response = await _hybridCache.GetOrCreateAsync(
-            key: cachableQuery.CacheKey,
+            key: scopedCacheKey,
             factory: async ctx => await next(),
             options: cacheOptions,
             tags: cachableQuery.CacheTags,

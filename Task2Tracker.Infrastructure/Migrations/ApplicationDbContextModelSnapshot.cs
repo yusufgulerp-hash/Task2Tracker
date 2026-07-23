@@ -47,7 +47,7 @@ namespace Task2Tracker.Infrastructure.Migrations
                     b.ToTable("Projects", (string)null);
                 });
 
-            modelBuilder.Entity("Task2Tracker.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("Task2Tracker.Domain.Entities.ProjectMember", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,28 +56,23 @@ namespace Task2Tracker.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("ExpiresAt")
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Token")
-                        .IsUnique();
-
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.HasIndex("ProjectId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ProjectMembers", (string)null);
                 });
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.TaskItem", b =>
@@ -177,15 +172,19 @@ namespace Task2Tracker.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Task2Tracker.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("Task2Tracker.Domain.Entities.ProjectMember", b =>
                 {
-                    b.HasOne("Task2Tracker.Domain.Entities.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
+                    b.HasOne("Task2Tracker.Domain.Entities.Project", null)
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Task2Tracker.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.TaskItem", b =>
@@ -208,13 +207,13 @@ namespace Task2Tracker.Infrastructure.Migrations
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.Project", b =>
                 {
+                    b.Navigation("Members");
+
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("Task2Tracker.Domain.Entities.User", b =>
                 {
-                    b.Navigation("RefreshTokens");
-
                     b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
