@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Common.Interfaces;
 using Task2Tracker.Application.Interfaces.Repositories;
@@ -11,15 +12,18 @@ public sealed class UpdateTaskCommandHandler
     private readonly ITaskRepository _taskRepository;
     private readonly IUserRepository _userRepository;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public UpdateTaskCommandHandler(
         ITaskRepository taskRepository,
         IUserRepository userRepository,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _taskRepository = taskRepository;
         _userRepository = userRepository;
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task Handle(
@@ -31,6 +35,17 @@ public sealed class UpdateTaskCommandHandler
 
         if (task is null)
             throw new NotFoundException("Görev bulunamadı.");
+
+        if (!_currentUser.IsAdmin)
+        {
+            var callerIsMember = await _context.ProjectMembers.AnyAsync(
+                m => m.ProjectId == task.ProjectId && m.UserId == _currentUser.UserId,
+                cancellationToken);
+
+            if (!callerIsMember)
+                throw new ForbiddenException(
+                    "Bu görevi güncelleme yetkiniz yok — görevin projesine üye değilsiniz.");
+        }
 
         // Done task'ı otomatik InProgress'e çeker, sonra status güncellemesi uygulanır
         task.UpdateDetails(request.Title, request.Description);
@@ -55,6 +70,15 @@ public sealed class UpdateTaskCommandHandler
 
             if (user is null)
                 throw new NotFoundException("Atanacak kullanıcı bulunamadı.");
+
+            // İş kuralı: bir task, sadece o projenin üyesi olan birine atanabilir.
+            var assigneeIsMember = await _context.ProjectMembers.AnyAsync(
+                m => m.ProjectId == task.ProjectId && m.UserId == request.UserId.Value,
+                cancellationToken);
+
+            if (!assigneeIsMember)
+                throw new BusinessRuleException(
+                    "Bu kullanıcı görevin projesinin üyesi değil, atama yapılamaz.");
 
             task.AssignUser(request.UserId.Value);
         }

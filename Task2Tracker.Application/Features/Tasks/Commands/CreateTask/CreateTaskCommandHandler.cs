@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Common.Interfaces;
 using Task2Tracker.Application.Interfaces.Repositories;
@@ -12,15 +13,18 @@ public sealed class CreateTaskCommandHandler
     private readonly ITaskRepository _taskRepository;
     private readonly IProjectRepository _projectRepository;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public CreateTaskCommandHandler(
         ITaskRepository taskRepository,
         IProjectRepository projectRepository,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _taskRepository = taskRepository;
         _projectRepository = projectRepository;
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task<Guid> Handle(
@@ -34,6 +38,19 @@ public sealed class CreateTaskCommandHandler
         if (project is null)
         {
             throw new NotFoundException("Project not found.");
+        }
+
+        if (!_currentUser.IsAdmin)
+        {
+            var isMember = await _context.ProjectMembers.AnyAsync(
+                m => m.ProjectId == request.ProjectId && m.UserId == _currentUser.UserId,
+                cancellationToken);
+
+            if (!isMember)
+            {
+                throw new ForbiddenException(
+                    "Bu projede task oluşturma yetkiniz yok — projenin üyesi değilsiniz.");
+            }
         }
 
         var task = new TaskItem(

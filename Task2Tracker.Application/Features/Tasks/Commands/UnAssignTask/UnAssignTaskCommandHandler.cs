@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Common.Interfaces;
 
@@ -8,13 +9,16 @@ public sealed class UnassignTaskCommandHandler : IRequestHandler<UnassignTaskCom
 {
     private readonly ITaskRepository _taskRepository;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
     public UnassignTaskCommandHandler(
         ITaskRepository taskRepository,
-        IApplicationDbContext context)
+        IApplicationDbContext context,
+        ICurrentUserService currentUser)
     {
         _taskRepository = taskRepository;
         _context = context;
+        _currentUser = currentUser;
     }
 
     public async Task Handle(
@@ -26,6 +30,17 @@ public sealed class UnassignTaskCommandHandler : IRequestHandler<UnassignTaskCom
 
         if (task is null)
             throw new NotFoundException("Görev bulunamadı.");
+
+        if (!_currentUser.IsAdmin)
+        {
+            var callerIsMember = await _context.ProjectMembers.AnyAsync(
+                m => m.ProjectId == task.ProjectId && m.UserId == _currentUser.UserId,
+                cancellationToken);
+
+            if (!callerIsMember)
+                throw new ForbiddenException(
+                    "Bu görevde atama kaldırma yetkiniz yok — görevin projesine üye değilsiniz.");
+        }
 
         if (task.UserId is null)
             throw new BusinessRuleException("Bu görev zaten hiçbir kullanıcıya atanmamış.");
