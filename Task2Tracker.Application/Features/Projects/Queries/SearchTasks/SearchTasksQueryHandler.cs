@@ -48,6 +48,7 @@ public sealed class SearchTasksQueryHandler
                 Id = x.Id,
                 Title = x.Title,
                 Description = x.Description,
+                BlockerNote = x.BlockerNote,
                 Status = x.Status,
                 Priority = x.Priority,
                 ProjectId = x.ProjectId,

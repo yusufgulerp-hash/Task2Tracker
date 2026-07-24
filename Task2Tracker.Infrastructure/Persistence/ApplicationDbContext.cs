@@ -21,7 +21,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // İleride buraya AuditLog (Veriyi kim değiştirdi, ne zaman değiştirdi) mekanizması ekleyebiliriz.
         return await base.SaveChangesAsync(cancellationToken);
     }
 

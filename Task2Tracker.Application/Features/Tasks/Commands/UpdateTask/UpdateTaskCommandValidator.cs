@@ -19,5 +19,8 @@ public sealed class UpdateTaskCommandValidator
 
         RuleFor(x => x.Status)
             .IsInEnum();
+
+        RuleFor(x => x.BlockerNote)
+            .MaximumLength(1000);
     }
 }

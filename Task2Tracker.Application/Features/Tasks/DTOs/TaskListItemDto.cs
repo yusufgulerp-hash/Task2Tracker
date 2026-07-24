@@ -10,6 +10,8 @@ public sealed class TaskListItemDto
 
     public string? Description { get; init; }
 
+    public string? BlockerNote { get; init; }
+
     public TaskProgressStatus Status { get; init; }
 
     public TaskPriority Priority { get; init; }

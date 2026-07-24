@@ -9,12 +9,7 @@ public class ProjectMember : BaseEntity
 
     protected ProjectMember() { }
 
-    // internal: bir ProjectMember yalnızca Project aggregate'i tarafından,
-    // Project.AddMember(...) üzerinden oluşturulabilir. Dışarıdan
-    // "new ProjectMember(...)" ile keyfi bir üyelik kaydı yaratılamaz —
-    // invariant'ın (aynı kullanıcı bir projeye iki kez üye olamaz) tek
-    // giriş noktası Project'tir.
-    internal ProjectMember(Guid projectId, Guid userId)
+      internal ProjectMember(Guid projectId, Guid userId)
     {
         if (projectId == Guid.Empty)
             throw new ArgumentException("Geçerli bir proje ID'si belirtilmelidir.", nameof(projectId));

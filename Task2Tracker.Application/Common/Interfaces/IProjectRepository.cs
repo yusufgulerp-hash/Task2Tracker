@@ -11,9 +11,6 @@ public interface IProjectRepository
         Guid id,
         CancellationToken cancellationToken = default);
 
-    // Üyelik ekleme/çıkarma işlemleri Project.AddMember/RemoveMember
-    // invariant'larının doğru çalışabilmesi için Members koleksiyonunun
-    // eager-load edilmiş olmasını gerektirir.
     Task<Project?> GetByIdWithMembersAsync(
         Guid id,
         CancellationToken cancellationToken = default);

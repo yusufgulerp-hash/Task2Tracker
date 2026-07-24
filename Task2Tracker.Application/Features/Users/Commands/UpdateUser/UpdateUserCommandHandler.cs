@@ -26,8 +26,7 @@ public class UpdateUserCommandHandler
         UpdateUserCommand request,
         CancellationToken cancellationToken)
     {
-        // Bir kullanıcı yalnızca kendi profilini güncelleyebilir;
-        // Admin ise herkesi güncelleyebilir.
+ 
         if (!_currentUser.IsAdmin && _currentUser.UserId != request.Id)
         {
             throw new ForbiddenException(

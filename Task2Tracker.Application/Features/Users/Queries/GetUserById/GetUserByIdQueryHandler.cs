@@ -25,9 +25,7 @@ public class GetUserByIdQueryHandler
 
         if (user is null)
         {
-            // Daha önce burada KeyNotFoundException fırlatılıyordu — bu tip
-            // GlobalExceptionMiddleware'in bildiği bir tip olmadığı için 404
-            // yerine 500 dönüyordu. NotFoundException ile düzeltiyoruz.
+    
             throw new NotFoundException(
                 $"User with id '{request.Id}' is not found.");
         }

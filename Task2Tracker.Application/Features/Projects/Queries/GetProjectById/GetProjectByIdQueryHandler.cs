@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Task2Tracker.Application.Common.Exceptions;
 using Task2Tracker.Application.Common.Interfaces;
 using Task2Tracker.Application.Features.Projects.DTOs;
+using Task2Tracker.Domain.Entities;
 
 namespace Task2Tracker.Application.Features.Projects.Queries.GetProjectById;
 
@@ -28,6 +29,7 @@ public sealed class GetProjectByIdQueryHandler
             .Where(p => p.Id == request.Id)
             .Select(p => new { p.Id, p.Name, p.CreatedAt })
             .FirstOrDefaultAsync(cancellationToken);
+
 
         if (project is null)
         {

@@ -50,6 +50,7 @@ public sealed class UpdateTaskCommandHandler
         // Done task'ı otomatik InProgress'e çeker, sonra status güncellemesi uygulanır
         task.UpdateDetails(request.Title, request.Description);
         task.UpdatePriority(request.Priority);
+        task.SetBlocker(request.BlockerNote);
 
         if (task.Status != request.Status)
         {

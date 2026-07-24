@@ -38,9 +38,6 @@ public sealed class CreateProjectCommandHandler
 
         var project = new Project(request.Name);
 
-        // Projeyi oluşturan kişi otomatik olarak üye olur — aksi halde
-        // GetAllProjects'teki üyelik filtresi devreye girdiğinde kendi
-        // oluşturduğu projeyi bile göremezdi.
         project.AddMember(_currentUser.UserId);
 
         _projectRepository.Add(project);

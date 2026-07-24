@@ -47,10 +47,10 @@ builder.Services.AddRateLimiter(options =>
 
             ipBanService.Ban(
                 clientIp,
-                TimeSpan.FromMinutes(3));
+                TimeSpan.FromMinutes(1));
 
             Log.Warning(
-                "IP banned for 3 minutes due to rate limit. IP: {ClientIp}",
+                "IP banned for 1 minute due to rate limit. IP: {ClientIp}",
                 clientIp);
         }
 
@@ -62,7 +62,7 @@ builder.Services.AddRateLimiter(options =>
             {
                 status = 429,
                 title = "Too Many Requests",
-                detail = "IP address temporarily banned for 3 minutes."
+                detail = "IP address temporarily banned for 1 minute."
             },
             cancellationToken: token);
     };
@@ -80,11 +80,25 @@ builder.Services.AddRateLimiter(options =>
                     factory: _ =>
                         new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 10,
+                            PermitLimit = 300,
                             Window = TimeSpan.FromMinutes(1),
                             QueueLimit = 0
                         });
             });
+});
+
+// ==========================
+// CORS (React frontend için)
+// ==========================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendCorsPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173") // Vite dev server varsayılan portu
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
 
 // ==========================
@@ -96,7 +110,7 @@ builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("default", limiterOptions =>
     {
-        limiterOptions.PermitLimit = 10;
+        limiterOptions.PermitLimit = 300;
         limiterOptions.Window = TimeSpan.FromMinutes(1);
         limiterOptions.QueueLimit = 0;
     });
@@ -148,6 +162,7 @@ if (app.Environment.IsDevelopment())
 app.UseGlobalExceptionMiddleware();
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
+app.UseCors("FrontendCorsPolicy");
 app.UseMiddleware<IpBanMiddleware>();
 app.UseRateLimiter(); 
 app.UseAuthentication();

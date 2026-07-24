@@ -37,5 +37,20 @@ services:
     volumes:
       - C:/app_logs:/app/logs
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: task2tracker-frontend
+
+    restart: unless-stopped
+
+    depends_on:
+      - api
+
+    ports:
+      - "5173:80"
+
 volumes:
   postgres_data:

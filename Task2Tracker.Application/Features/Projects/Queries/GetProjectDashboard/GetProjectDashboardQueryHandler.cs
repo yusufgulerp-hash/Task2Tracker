@@ -69,6 +69,7 @@ public sealed class GetProjectDashboardQueryHandler
                 Id = t.Id,
                 Title = t.Title,
                 Description = t.Description,
+                BlockerNote = t.BlockerNote,
                 Status = t.Status,
                 Priority = t.Priority,
                 ProjectId = t.ProjectId,

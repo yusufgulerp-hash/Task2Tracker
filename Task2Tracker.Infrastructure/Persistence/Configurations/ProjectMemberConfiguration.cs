@@ -26,8 +26,7 @@ public sealed class ProjectMemberConfiguration : IEntityTypeConfiguration<Projec
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Aynı kullanıcı aynı projeye iki kez üye olamaz — domain'deki
-        // IsMember/AddMember kontrolüne ek olarak DB seviyesinde de garanti.
+     
         builder.HasIndex(x => new { x.ProjectId, x.UserId }).IsUnique();
 
         builder.HasIndex(x => x.UserId);

@@ -16,6 +16,9 @@ public sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Property(x => x.Description)
             .HasMaxLength(2000);
 
+        builder.Property(x => x.BlockerNote)
+            .HasMaxLength(1000);
+
         builder.Property(x => x.Status)
             .HasConversion<int>();
 

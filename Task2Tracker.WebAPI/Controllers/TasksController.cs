@@ -107,7 +107,8 @@ public sealed class TasksController : ControllerBase
             request.Description,
             request.Priority,
             request.Status,
-            request.UserId);
+            request.UserId,
+            request.BlockerNote);
 
         await _mediator.Send(command);
 

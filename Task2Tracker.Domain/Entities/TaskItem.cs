@@ -10,6 +10,10 @@ public class TaskItem : BaseEntity
     public TaskProgressStatus Status { get; private set; }
     public TaskPriority Priority { get; private set; }
 
+    // Görevi ilerletmeyi engelleyen bir durum varsa (birinden onay
+    // bekleniyor, bir bağımlılık tamamlanmadı vb.) buraya not düşülür.
+    public string? BlockerNote { get; private set; }
+
     public Guid ProjectId { get; private set; }
     public Project Project { get; private set; } = null!;
 
@@ -101,6 +105,15 @@ public class TaskItem : BaseEntity
     public void UpdatePriority(TaskPriority newPriority)
     {
         Priority = newPriority;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetBlocker(string? blockerNote)
+    {
+        // Boş/whitespace bir metin gelirse "blocker yok" anlamına gelsin —
+        // client'ın boş string mi null mu gönderdiğini ayırt etmesine
+        // gerek kalmasın.
+        BlockerNote = string.IsNullOrWhiteSpace(blockerNote) ? null : blockerNote;
         UpdatedAt = DateTime.UtcNow;
     }
 }

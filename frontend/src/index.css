@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Zemin */
+  --color-bg: #F7F8FA;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #EEF1F4;
+  --color-border: #E2E6EB;
+
+  /* Metin */
+  --color-ink: #14171F;
+  --color-ink-muted: #5B6472;
+  --color-ink-faint: #9AA3AF;
+
+  /* Marka / vurgu — "dal" rengi */
+  --color-branch: #2F6F5E;
+  --color-branch-hover: #24594B;
+  --color-branch-soft: #E4EEEA;
+
+  /* Durum renkleri */
+  --color-amber: #C98A2B;
+  --color-amber-soft: #FBF1E0;
+  --color-red: #C1483D;
+  --color-red-soft: #FBEAE8;
+  --color-blue: #3B6EA5;
+  --color-blue-soft: #E9F0F7;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}

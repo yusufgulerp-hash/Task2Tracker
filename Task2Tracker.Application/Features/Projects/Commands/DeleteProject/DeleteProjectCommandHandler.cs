@@ -29,7 +29,6 @@ public sealed class DeleteProjectCommandHandler
         DeleteProjectCommand request,
         CancellationToken cancellationToken)
     {
-        // Proje silme yıkıcı bir işlem — DeleteUser'da olduğu gibi Admin-only.
         if (!_currentUser.IsAdmin)
             throw new ForbiddenException("Proje silme yetkiniz yok.");
 

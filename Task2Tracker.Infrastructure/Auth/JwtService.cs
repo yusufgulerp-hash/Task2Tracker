@@ -48,7 +48,6 @@ public sealed class JwtService : IJwtService, IPasswordService
 
     public string HashPassword(string password)
         => BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
-    // workFactor: 12 → 2^12 = 4096 iterasyon, brute-force'u zorlaştırır
 
     public bool VerifyPassword(string password, string hash)
         => BCrypt.Net.BCrypt.Verify(password, hash);

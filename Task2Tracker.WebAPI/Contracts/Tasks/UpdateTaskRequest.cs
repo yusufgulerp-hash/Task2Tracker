@@ -7,4 +7,5 @@ public sealed record UpdateTaskRequest(
     string? Description,
     TaskPriority Priority,
     TaskProgressStatus Status,
-    Guid? UserId);
+    Guid? UserId,
+    string? BlockerNote = null);

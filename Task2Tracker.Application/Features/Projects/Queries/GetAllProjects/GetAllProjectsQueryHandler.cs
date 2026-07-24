@@ -29,9 +29,6 @@ public sealed class GetAllProjectsQueryHandler
     {
         var projects = await _projectRepository.GetAllAsync(cancellationToken);
 
-        // Admin tüm projeleri görür; diğer kullanıcılar sadece üyesi
-        // olduğu projeleri görebilir ("kullanıcı sadece üyesi olduğu
-        // projeyi görebilmeli" kuralı).
         if (!_currentUser.IsAdmin)
         {
             var memberProjectIds = await _context.ProjectMembers

@@ -52,6 +52,7 @@ public sealed class GetTaskByIdQueryHandler
             Id = task.Id,
             Title = task.Title,
             Description = task.Description,
+            BlockerNote = task.BlockerNote,
             Status = task.Status,
             Priority = task.Priority,
             ProjectId = task.ProjectId,

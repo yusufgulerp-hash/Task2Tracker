@@ -24,9 +24,6 @@ public sealed class CurrentUserService : ICurrentUserService
     {
         get
         {
-            // ASP.NET Core JwtBearer varsayılan olarak "sub" claim'ini
-            // ClaimTypes.NameIdentifier'a map'leyebiliyor (MapInboundClaims ayarına göre).
-            // İkisini de kontrol ederek konfigürasyon değişse bile kırılmayı önlüyoruz.
             var value =
                 User?.FindFirstValue(JwtRegisteredClaimNames.Sub)
                 ?? User?.FindFirstValue(ClaimTypes.NameIdentifier);

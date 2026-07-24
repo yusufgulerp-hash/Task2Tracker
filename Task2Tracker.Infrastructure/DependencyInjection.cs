@@ -53,11 +53,9 @@ public static class DependencyInjection
         // ==========================
         // JWT Ayarları
         // ==========================
-        // Options Pattern: appsettings'teki "JwtSettings" bloğunu JwtSettings sınıfına bağla
         services.Configure<JwtSettings>(
             configuration.GetSection("JwtSettings"));
 
-        // Scoped: her HTTP isteği için bir instance
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordService, JwtService>();
 
@@ -78,9 +76,6 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
-                // "sub" claim'i varsayılan olarak ClaimTypes.NameIdentifier'a
-                // map'lenebiliyor; bunu kapatıp token'daki claim adlarını
-                // olduğu gibi (sub, email, role) kullanıyoruz.
                 options.MapInboundClaims = false;
 
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -93,7 +88,7 @@ public static class DependencyInjection
                     ValidAudience = jwtSettings.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-                    ClockSkew = TimeSpan.Zero // Varsayılan 5dk tolerans — sıfırlıyoruz
+                    ClockSkew = TimeSpan.Zero 
                 };
             });
 
